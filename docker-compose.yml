@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: './docker/app'
+      dockerfile: Dockerfile
+      args:
+        USER_ID: '${APP_USER_ID:-1000}'
+        GROUP_ID: '${APP_USER_GROUP_ID:-1000}'
+        GROUP: '${APP_USER_GROUP:-whoarewe}'
+        USER: '${APP_USER:-whoami}'
+    tty: true
+    container_name: invoices-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./:/var/www
+      - ./docker/app/local.ini:/usr/local/etc/php/conf.d/local.ini
+  nginx:
+    image: nginx:1.23.3-alpine
+    container_name: invoices-nginx
+    restart: unless-stopped
+    ports:
+      - '8000:80'
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+  mysql:
+    container_name: invoices-db
+    image: mysql:8.0
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - '${DB_POPRT}:3306'
+volumes:
+    mysql-data:
+      driver: local

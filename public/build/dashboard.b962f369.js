@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkinvoices=self.webpackChunkinvoices||[]).push([[966],{8572:()=>{}},s=>{var e;e=8572,s(s.s=e)}]);
